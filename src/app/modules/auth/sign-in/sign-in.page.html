@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Ingreso al sistema</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <ion-list>
+      <ion-item lines="none" class="ion-text-center">
+        <img src="assets/logo.jpg" alt="">
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Correo electrónico</ion-label>
+        <ion-input formControlName="email"></ion-input>
+      </ion-item>
+      <ion-item lines="none" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+      <ion-text color="danger" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+        <p *ngIf="loginForm.get('email')?.errors">Campo requerido.</p>
+      </ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating">Contraseña</ion-label>
+        <ion-input type="password" formControlName="password"></ion-input>
+      </ion-item>
+      <ion-item lines="none" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        <ion-text color="danger" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          <p *ngIf="loginForm.get('password')?.errors">Campo requerido.</p>
+        </ion-text>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="full" type="submit" class="btn-main" [disabled]="loginForm.invalid">
+      Ingresar <ion-icon name="caret-forward-circle"></ion-icon>
+    </ion-button>
+  </form>
+</ion-content>

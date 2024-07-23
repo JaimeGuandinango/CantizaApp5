@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-back-button slot="start" (click)="backList()"></ion-back-button>
+    <ion-title>Registro de producción</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+    <ion-item>
+      <ion-label>Trabajador</ion-label>
+      <ion-select formControlName="trabajador">
+        <ion-select-option selected value="">Seleccione uno</ion-select-option>
+        <ion-select-option *ngFor="let user of users" [value]="user.id">{{ user.name }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <div *ngIf="registrationForm.get('identifier')?.invalid && registrationForm.get('identifier')?.touched">
+      <small *ngIf="registrationForm.get('identifier')?.errors">Identifier is required.</small>
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Número de Mallas</ion-label>
+      <ion-input formControlName="malla"></ion-input>
+    </ion-item>
+    <div *ngIf="registrationForm.get('malla')?.invalid && registrationForm.get('malla')?.touched">
+      <small *ngIf="registrationForm.get('malla')?.errors">Malla is required.</small>
+    </div>
+
+    <ion-item>
+      <ion-label position="floating">Número de tallos extra</ion-label>
+      <ion-input formControlName="tallosextra"></ion-input>
+    </ion-item>
+    <div *ngIf="registrationForm.get('tallosextra')?.invalid && registrationForm.get('tallosextra')?.touched">
+      <small *ngIf="registrationForm.get('tallosextra')?.errors">Tallos Extra is required.</small>
+    </div>
+
+    <ion-button class="btn-main" expand="full" type="submit" [disabled]="registrationForm.invalid">Guardar producción</ion-button>
+  </form>
+</ion-content>

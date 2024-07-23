@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button/>
+    </ion-buttons>
+    <ion-title>Asignación diaria</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item *ngFor="let item of history">
+      <ion-label>
+        <h4> <b>F-A-B-R:</b> {{ item.info }} </h4>
+        <h4> <b>Trabajador:</b> {{ item.trabajador }} </h4>
+        <h4> <b>Nro de mallas:</b> {{ item.mallas }} </h4>
+        <h4> <b>Nro de tallos:</b> {{ item.tallos }} </h4>
+        <h4> <b>Subtotal:</b> {{ item.subtotal }} </h4>
+        <h4> <b>Creacion:</b> {{ item.fecha }} </h4>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+  <ion-item *ngIf="history.length===0">
+    <ion-label>
+      <h4> No hay registros </h4>
+    </ion-label>
+  </ion-item>
+</ion-content>

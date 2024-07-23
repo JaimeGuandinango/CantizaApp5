@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button/>
+    </ion-buttons>
+    <ion-title>Asignación para hoy</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item *ngFor="let item of history" (click)="registerWork(item)">
+      <ion-label>
+        <h4> <b>F-A-B-R:</b> {{ item.info }} </h4>
+        <h4> <b>Nro de tallos:</b> {{ item.tallos }} </h4>
+        <h4> <b>Creacion:</b> {{ item.create }} </h4>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+  <ion-item *ngIf="history.length===0">
+    <ion-label>
+      <h4> No hay asignaciones para hoy </h4>
+    </ion-label>
+  </ion-item>
+</ion-content>
