@@ -50,6 +50,7 @@ export class AppComponent {
     } else {
       console.log('Fetching items from the local SQLite database');
       this.presentToast('bottom', 'Offline: Fetching items from the local SQLite database');
+      this.dbService.openDB();
       localStorage.setItem('isOnline', 'OFF');
     }
   }

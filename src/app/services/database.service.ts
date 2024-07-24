@@ -262,6 +262,8 @@ CREATE TABLE can_usuario (
 
   //LOGIN WITH TABLE CAN_USUARIO
   public async login(data: any): Promise<any> {
+    console.log("LOGIN",data);
+    
     const query = `SELECT can_usu_id as id FROM can_usuario WHERE can_usu_email = '${data.email}' AND can_usu_password = '${data.password}'`;
     const res = await this.db.query(query);
     return res.values;
@@ -297,6 +299,7 @@ CREATE TABLE can_usuario (
       // Query for can_ingresos
       const ingresosQuery = `SELECT * FROM can_ingresos WHERE can_ing_cochero = ${user} AND can_ing_create = ${date}`;
       const ingresosResult:any = await this.db.query(ingresosQuery);
+      console.log("ingresosResult",ingresosResult.values);
       
       const data = [];
       for (const row of ingresosResult.values) {
@@ -306,11 +309,14 @@ CREATE TABLE can_usuario (
         // Query for can_base
         const baseQuery = `SELECT * FROM can_base WHERE can_bas_id = ?`;
         const baseResult:any = await this.db.query(baseQuery, [baseId]);
+         console.log("baseResult",baseResult.values);
+         
         const info = baseResult.values.length > 0 ? baseResult.values[0].can_bas_info : '';
   
         // Query for can_usuario
         const userQuery = `SELECT * FROM can_usuario WHERE can_usu_id = ?`;
         const userResult:any = await this.db.query(userQuery, [trabajadorId]);
+        console.log("userResult",userResult.values);
         const userName = userResult.values.length > 0 ? userResult.values[0].can_usu_name : '';
   
         data.push({
@@ -337,8 +343,15 @@ CREATE TABLE can_usuario (
       
       if (res.length > 0) {
         res.forEach((item:any) => {
-          console.log("ITEM",item);          
-          this.cantizaService.registerWork(item).subscribe({
+          console.log("ITEM",item);    
+          let data = {
+            cochero: item.can_ing_cochero,
+            identifier: item.can_ing_base,
+            malla: item.can_ing_mallas,
+            tallosextra: item.can_ing_tallos,
+            trabajador: item.can_ing_trabajador
+          }      
+          this.cantizaService.registerWork(data).subscribe({
             next: (res) => {
               console.log(res);
               this.createDatabase();
