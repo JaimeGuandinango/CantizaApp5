@@ -44,7 +44,7 @@ export class ListPage implements OnInit {
   }
 
   getHistory() {
-    if (this.isOnline) {
+    if (!this.isOnline) {
       this.cantizaService.getHistory(this.userId).subscribe({
         next: (res) => {
           this.history = res;
@@ -55,6 +55,8 @@ export class ListPage implements OnInit {
       }); 
     }else{
       this.dbService.getHistory(this.userId).then((res) => {
+        console.log("getHistory",res);
+        
         this.history = res;
       });
     }

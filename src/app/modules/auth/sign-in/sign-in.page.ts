@@ -55,7 +55,7 @@ export class SignInPage implements OnInit {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      if (this.isOnline) {
+      if (!this.isOnline) {
         this.cantizaService.login(this.loginForm.value).subscribe({
           next: (res) => {
             console.log(res);
@@ -71,7 +71,6 @@ export class SignInPage implements OnInit {
       }else{
         this.dBService.login(this.loginForm.value).then((res) => {
           console.log(res);
-          
           if (res.length > 0) {
             console.log(res);
             this.presentToast('top', 'Inicio de sesión exitoso');

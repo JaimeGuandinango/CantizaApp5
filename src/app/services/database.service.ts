@@ -19,15 +19,14 @@ export class DatabaseService {
     try {
       console.log("Creating database");
       
-      this.db = await this.sqlite.createConnection(
-        'cantiza',
-        false,
-        'no-encryption',
-        1,
-        false
-      );
-      await this.db.open();
-      await this.saveInformation();
+      // this.db = await this.sqlite.createConnection(
+      //   'cantiza',
+      //   false,
+      //   'no-encryption',
+      //   1,
+      //   false
+      // );
+      // await this.db.open();
       await this.createTables();
       await this.populateTables();
     } catch (error) {
@@ -228,7 +227,7 @@ CREATE TABLE can_usuario (
 
   //LOGIN WITH TABLE CAN_USUARIO
   public async login(data: any): Promise<any> {
-    const query = `SELECT * FROM can_usuario WHERE can_usu_email = '${data.email}' AND can_usu_password = '${data.password}'`;
+    const query = `SELECT can_usu_id as id FROM can_usuario WHERE can_usu_email = '${data.email}' AND can_usu_password = '${data.password}'`;
     const res = await this.db.query(query);
     return res.values;
   }
@@ -242,7 +241,7 @@ CREATE TABLE can_usuario (
 
   // GET ALL HISTORY BY USER
   public async getHistory(user: number): Promise<any> {
-    const query = `SELECT * FROM can_registro WHERE can_reg_usuario = ${user}`;
+    const query = `SELECT * FROM can_base  WHERE can_bas_worker = ${user} AND can_bas_date_asig = DATE('now') ORDER BY can_bas_create asc`;
     const res = await this.db.query(query);
     return res.values;
   }
@@ -259,12 +258,15 @@ CREATE TABLE can_usuario (
           this.cantizaService.registerWork(item).subscribe({
             next: (res) => {
               console.log(res);
+              this.createDatabase();
             },
             error: (err) => {
               console.log(err);
             }
           });
         });
+      }else{
+        this.createDatabase();
       }
     }
     );
