@@ -43,7 +43,8 @@ export class HistoryPage implements OnInit {
         }
       });
     } else {
-      this.dbService.getHistory(this.userId).then((res) => {
+      this.dbService.getListHistory(this.userId).then((res) => {
+        console.log("getListHistory",res);
         this.history = res;
       });
     }

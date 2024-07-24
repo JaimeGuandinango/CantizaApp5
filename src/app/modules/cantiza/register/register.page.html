@@ -15,7 +15,7 @@
       </ion-select>
     </ion-item>
     <div *ngIf="registrationForm.get('trabajador')?.invalid && registrationForm.get('trabajador')?.touched">
-      <small *ngIf="registrationForm.get('trabajador')?.errors">Identifier is required.</small>
+      <small *ngIf="registrationForm.get('trabajador')?.errors">Trabajador es requerido.</small>
     </div>
 
     <ion-item>
@@ -23,7 +23,7 @@
       <ion-input formControlName="malla"></ion-input>
     </ion-item>
     <div *ngIf="registrationForm.get('malla')?.invalid && registrationForm.get('malla')?.touched">
-      <small *ngIf="registrationForm.get('malla')?.errors">Malla is required.</small>
+      <small *ngIf="registrationForm.get('malla')?.errors">Número de Mallas es requerido.</small>
     </div>
 
     <ion-item>
@@ -31,7 +31,7 @@
       <ion-input formControlName="tallosextra"></ion-input>
     </ion-item>
     <div *ngIf="registrationForm.get('tallosextra')?.invalid && registrationForm.get('tallosextra')?.touched">
-      <small *ngIf="registrationForm.get('tallosextra')?.errors">Tallos Extra is required.</small>
+      <small *ngIf="registrationForm.get('tallosextra')?.errors">Tallos Extra es requerido.</small>
     </div>
 
     <ion-button class="btn-main" expand="full" type="submit" [disabled]="registrationForm.invalid">Guardar producción</ion-button>

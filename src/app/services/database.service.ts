@@ -89,21 +89,21 @@ CREATE TABLE can_informacion (
 );
 
 CREATE TABLE can_ingresos (
-  can_ing_id INTEGER NOT NULL,
+  can_ing_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   can_ing_base INTEGER NOT NULL,
   can_ing_cochero INTEGER NOT NULL,
   can_ing_trabajador INTEGER NOT NULL,
   can_ing_mallas INTEGER NOT NULL,
   can_ing_tallos INTEGER NOT NULL,
   can_ing_subtotal INTEGER NOT NULL,
-  can_ing_create TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  can_ing_create TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  can_es_local INTEGER
 );
 
 CREATE TABLE can_registro (
   can_reg_id INTEGER NOT NULL,
   can_reg_usuario INTEGER NOT NULL,
-  can_reg_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  can_es_local INTEGER NOT NULL
+  can_reg_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE can_rosas (
@@ -218,11 +218,47 @@ CREATE TABLE can_usuario (
   }
 
   public async insertDataIngresos(data: any): Promise<void> {
-    data['can_es_local'] = 1;
-    const keys = Object.keys(data).join(', ');
-    const values = Object.values(data).map(value => `'${value}'`).join(', ');
+    let tallosdb = 0;
+    if (data['tallosextra'] === 0) {
+      const sql = `SELECT can_bas_numerodetallos FROM can_base WHERE can_bas_id = ?`;
+      const result:any = await this.db.query(sql, [data['identifier']]);
+      
+      if (result.values.length > 0) {
+        const row_info = result.values[0];
+        tallosdb = row_info.can_bas_numerodetallos;
+      } else {
+        throw new Error('No records found or error in the query');
+      }
+    } else {
+      tallosdb = data['tallosextra'];
+    }
+    const subtotal = (tallosdb || 0) * data['malla'];
+    let dataEnd = {
+      can_ing_cochero:data['cochero'], 
+      can_ing_base:data['identifier'], 
+      can_ing_trabajador:data['trabajador'], 
+      can_ing_mallas:data['malla'], 
+      can_ing_tallos:data['tallosextra'],
+      can_ing_subtotal:subtotal,
+      can_es_local: 1,
+      can_ing_create: this.getFormattedDate()
+    }
+    const keys = Object.keys(dataEnd).join(', ');
+    const values = Object.values(dataEnd).map(value => `'${value}'`).join(', ');
     const query = `INSERT INTO can_ingresos (${keys}) VALUES (${values})`;
     await this.db.execute(query);
+
+    const selectQuery = `SELECT can_bas_totalcosecha FROM can_base WHERE can_bas_id = ?`;
+    const selectResult:any = await this.db.query(selectQuery, [data['identifier']]);
+    
+    if (selectResult.values.length > 0) {
+      const currentTotal = selectResult.values[0].can_bas_totalcosecha || 0;
+      const newTotal = (currentTotal || 0) + subtotal;
+      
+      // Update totalcosecha
+      const updateQuery = `UPDATE can_base SET can_bas_totalcosecha = ? WHERE can_bas_id = ?`;
+      await this.db.run(updateQuery, [newTotal, data['identifier']]);
+    }
   }
 
   //LOGIN WITH TABLE CAN_USUARIO
@@ -234,16 +270,63 @@ CREATE TABLE can_usuario (
 
   // GET ALL USERS BY TYPE
   public async getUsuarios(type: number): Promise<any> {
-    const query = `SELECT * FROM can_usuario WHERE can_usu_tipo = ${type}`;
+    const query = `SELECT can_usu_id as id, can_usu_name as name FROM can_usuario WHERE can_usu_tipo = ${type}`;
     const res = await this.db.query(query);
     return res.values;
   }
 
   // GET ALL HISTORY BY USER
   public async getHistory(user: number): Promise<any> {
-    const query = `SELECT * FROM can_base  WHERE can_bas_worker = ${user} AND can_bas_date_asig = DATE('now') ORDER BY can_bas_create asc`;
+    const date = this.getFormattedDate();
+    const query = `SELECT 
+      can_bas_id as id,
+      can_bas_worker as worker,
+      can_bas_info as info,
+      can_bas_date_asig as datea,
+      can_bas_numerodetallos as tallos,
+      can_bas_totalcosecha as totalc,
+      can_bas_create as fcreate
+    FROM can_base  WHERE can_bas_worker = ${user} AND can_bas_date_asig = '${date}'`;
     const res = await this.db.query(query);
     return res.values;
+  }
+
+
+  public async getListHistory(user: number): Promise<any> {
+    const date = this.getFormattedDate();
+      
+      // Query for can_ingresos
+      const ingresosQuery = `SELECT * FROM can_ingresos WHERE can_ing_cochero = ${user} AND can_ing_create = ${date}`;
+      const ingresosResult:any = await this.db.query(ingresosQuery);
+      
+      const data = [];
+      for (const row of ingresosResult.values) {
+        const baseId = row.can_ing_base;
+        const trabajadorId = row.can_ing_trabajador;
+        
+        // Query for can_base
+        const baseQuery = `SELECT * FROM can_base WHERE can_bas_id = ?`;
+        const baseResult:any = await this.db.query(baseQuery, [baseId]);
+        const info = baseResult.values.length > 0 ? baseResult.values[0].can_bas_info : '';
+  
+        // Query for can_usuario
+        const userQuery = `SELECT * FROM can_usuario WHERE can_usu_id = ?`;
+        const userResult:any = await this.db.query(userQuery, [trabajadorId]);
+        const userName = userResult.values.length > 0 ? userResult.values[0].can_usu_name : '';
+  
+        data.push({
+          id: row.can_ing_id,
+          base: row.can_ing_base,
+          mallas: row.can_ing_mallas,
+          tallos: row.can_ing_tallos,
+          trabajador: userName,
+          subtotal: row.can_ing_subtotal,
+          fecha: row.can_ing_create,
+          info: info
+        });
+      }
+      
+      return data; 
   }
 
   async saveInformation() {
@@ -255,6 +338,7 @@ CREATE TABLE can_usuario (
       
       if (res.length > 0) {
         res.forEach((item:any) => {
+          console.log("ITEM",item);          
           this.cantizaService.registerWork(item).subscribe({
             next: (res) => {
               console.log(res);
@@ -282,4 +366,22 @@ CREATE TABLE can_usuario (
     );
     await this.db.open();
   }
+
+  getFormattedDate(): string {
+    const date = new Date();
+
+    // Format the date for Ecuadorian locale
+    const formatter = new Intl.DateTimeFormat('es-EC', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    
+    // Format the date string and split into components
+    const parts = formatter.format(date).split('/');
+
+    // Return date in 'yyyy-mm-dd' format
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+
 }

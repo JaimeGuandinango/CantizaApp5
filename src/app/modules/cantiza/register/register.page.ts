@@ -33,22 +33,26 @@ export class RegisterPage implements OnInit {
     private dbService: DatabaseService
 
   ) { 
+    this.idWork = this.activatedRoute.snapshot.params['id']; 
     this.initForm();
   }
 
   async ngOnInit() {
-    this.idWork = this.activatedRoute.snapshot.params['id']; 
     this.isOnline = await this.networkService.checkNetworkStatus();   
     this.getUsers();
   }
 
   initForm() {
+    console.log('initForm');
+    console.log('userId', this.userId);
+    console.log('idWork', this.idWork);    
+    
     this.registrationForm = this.fb.group({
       cochero: [this.userId, Validators.required],
       identifier: [this.idWork, Validators.required],
       trabajador: ['', Validators.required],
       malla: ['', Validators.required],
-      tallosextra: [0, Validators.required]
+      tallosextra: [0]
     });
   }
 
@@ -77,7 +81,7 @@ export class RegisterPage implements OnInit {
   }
 
   getUsers() {
-    if (this.isOnline) {
+    if (!this.isOnline) {
       this.cantizaService.getUsuarios(this.userId).subscribe({
         next: (res) => {
           this.users = res;
