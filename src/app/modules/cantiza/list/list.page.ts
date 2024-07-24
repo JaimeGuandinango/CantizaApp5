@@ -44,7 +44,7 @@ export class ListPage implements OnInit {
   }
 
   getHistory() {
-    if (!this.isOnline) {
+    if (this.isOnline) {
       this.cantizaService.getHistory(this.userId).subscribe({
         next: (res) => {
           this.history = res;

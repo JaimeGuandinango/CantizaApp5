@@ -33,7 +33,7 @@ export class HistoryPage implements OnInit {
   }
 
   getHistory() {
-    if(!this.isOnline) {
+    if(this.isOnline) {
       this.cantizaService.getHistoryRegister(this.userId).subscribe({
         next: (res) => {
           this.history = res;

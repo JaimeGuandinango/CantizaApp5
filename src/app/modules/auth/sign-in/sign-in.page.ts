@@ -55,7 +55,7 @@ export class SignInPage implements OnInit {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      if (!this.isOnline) {
+      if (this.isOnline) {
         this.cantizaService.login(this.loginForm.value).subscribe({
           next: (res) => {
             console.log(res);

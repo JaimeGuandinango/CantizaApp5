@@ -58,7 +58,7 @@ export class RegisterPage implements OnInit {
 
   onSubmit() {
     if (this.registrationForm.valid) {
-      if(!this.isOnline) {
+      if(this.isOnline) {
         this.cantizaService.registerWork(this.registrationForm.value).subscribe({
           next: (res) => {
             this.presentToast('top', 'Registro exitoso');
@@ -81,7 +81,7 @@ export class RegisterPage implements OnInit {
   }
 
   getUsers() {
-    if (!this.isOnline) {
+    if (this.isOnline) {
       this.cantizaService.getUsuarios(this.userId).subscribe({
         next: (res) => {
           this.users = res;
