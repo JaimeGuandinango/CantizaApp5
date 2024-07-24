@@ -165,7 +165,6 @@ CREATE TABLE can_usuario (
 
   async getItems() {
     try {
-      console.log("Getting items");
       const selectQuery = 'SELECT * FROM can_ingresos where can_es_local = 1';
       const res:any = await this.db.query(selectQuery);
       if (res.values.length > 0) {

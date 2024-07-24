@@ -25,10 +25,12 @@ export class HistoryPage implements OnInit {
     private menuCtrl:MenuController,
     private networkService: NetworkService,
     private dbService: DatabaseService
-  ) { }
-
-  ngOnInit() {
+  ) { 
     this.menuCtrl.enable(true);
+  }
+
+  async ngOnInit() {
+    this.isOnline = await this.networkService.checkNetworkStatus();
     this.getHistory();
   }
 

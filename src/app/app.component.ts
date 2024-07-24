@@ -37,7 +37,6 @@ export class AppComponent {
 
   async checkNetwork() {
     this.presentToast('bottom', 'Check Status');
-
     this.isOnline = await this.networkService.checkNetworkStatus();
     this.loadItems();
   }
