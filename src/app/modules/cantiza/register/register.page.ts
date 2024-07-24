@@ -32,12 +32,13 @@ export class RegisterPage implements OnInit {
     private networkService: NetworkService,
     private dbService: DatabaseService
 
-  ) { }
+  ) { 
+    this.initForm();
+  }
 
   async ngOnInit() {
     this.idWork = this.activatedRoute.snapshot.params['id']; 
     this.isOnline = await this.networkService.checkNetworkStatus();   
-    this.initForm();
     this.getUsers();
   }
 
@@ -54,7 +55,6 @@ export class RegisterPage implements OnInit {
   onSubmit() {
     if (this.registrationForm.valid) {
       if(this.isOnline) {
-
         this.cantizaService.registerWork(this.registrationForm.value).subscribe({
           next: (res) => {
             this.presentToast('top', 'Registro exitoso');

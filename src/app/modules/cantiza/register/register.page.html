@@ -14,8 +14,8 @@
         <ion-select-option *ngFor="let user of users" [value]="user.id">{{ user.name }}</ion-select-option>
       </ion-select>
     </ion-item>
-    <div *ngIf="registrationForm.get('identifier')?.invalid && registrationForm.get('identifier')?.touched">
-      <small *ngIf="registrationForm.get('identifier')?.errors">Identifier is required.</small>
+    <div *ngIf="registrationForm.get('trabajador')?.invalid && registrationForm.get('trabajador')?.touched">
+      <small *ngIf="registrationForm.get('trabajador')?.errors">Identifier is required.</small>
     </div>
 
     <ion-item>
