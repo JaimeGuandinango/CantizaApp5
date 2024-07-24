@@ -32,7 +32,6 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      this.dbService.createDatabase();
     });
   }
 
@@ -46,8 +45,9 @@ export class AppComponent {
   async loadItems() {
     if (this.isOnline) {
       console.log('Fetching items from the online API');
-      this.presentToast('bottom', 'Online: Fetching items from the online API');
+      this.presentToast('bottom', 'Sincronizando las información');
       localStorage.setItem('isOnline', 'ON');
+      await this.dbService.saveInformation();
     } else {
       console.log('Fetching items from the local SQLite database');
       this.presentToast('bottom', 'Offline: Fetching items from the local SQLite database');

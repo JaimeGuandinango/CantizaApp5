@@ -48,8 +48,8 @@ export class SignInPage implements OnInit {
   initForm() {
     //formulario reactivo
     this.loginForm = this.fb.group({
-      email: [null, [Validators.required, Validators.email]],
-      password: [null, [Validators.required, Validators.minLength(6)]]
+      email: ['jm@gmail.com', [Validators.required, Validators.email]],
+      password: ['123456', [Validators.required, Validators.minLength(6)]]
     });
   }
 
@@ -70,6 +70,8 @@ export class SignInPage implements OnInit {
         });
       }else{
         this.dBService.login(this.loginForm.value).then((res) => {
+          console.log(res);
+          
           if (res.length > 0) {
             console.log(res);
             this.presentToast('top', 'Inicio de sesión exitoso');

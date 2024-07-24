@@ -17,6 +17,8 @@ export class DatabaseService {
 
   async createDatabase() {
     try {
+      console.log("Creating database");
+      
       this.db = await this.sqlite.createConnection(
         'cantiza',
         false,
@@ -25,6 +27,7 @@ export class DatabaseService {
         false
       );
       await this.db.open();
+      await this.saveInformation();
       await this.createTables();
       await this.populateTables();
     } catch (error) {
@@ -32,6 +35,8 @@ export class DatabaseService {
     }
   }
   async createTables() {
+    console.log("Creating tables");
+    
     try {
       const createTableQuery = `
       CREATE TABLE can_area (
@@ -149,6 +154,7 @@ CREATE TABLE can_usuario (
 
    async executeSQL(sql: string) {
     try {
+      console.log("Executing SQL");
       const statements = sql.split(';').filter(stmt => stmt.trim().length > 0);
       for (const stmt of statements) {
         await this.db.execute(stmt);
@@ -160,9 +166,14 @@ CREATE TABLE can_usuario (
 
   async getItems() {
     try {
-      const selectQuery = 'SELECT * FROM items';
-      const res = await this.db.query(selectQuery);
-      return res.values;
+      console.log("Getting items");
+      const selectQuery = 'SELECT * FROM can_ingresos where can_es_local = 1';
+      const res:any = await this.db.query(selectQuery);
+      if (res.values.length > 0) {
+        return res.values;
+      } else {
+        return [];
+      }
     } catch (error) {
       console.error('Unable to get items', error);
       return [];
@@ -236,5 +247,37 @@ CREATE TABLE can_usuario (
     return res.values;
   }
 
-  
+  async saveInformation() {
+    console.log("Saving information");
+    
+    await this.openDB();
+    this.getItems().then((res:any) => {
+      console.log("RESPONSE",res);
+      
+      if (res.length > 0) {
+        res.forEach((item:any) => {
+          this.cantizaService.registerWork(item).subscribe({
+            next: (res) => {
+              console.log(res);
+            },
+            error: (err) => {
+              console.log(err);
+            }
+          });
+        });
+      }
+    }
+    );
+  }
+
+  async openDB() {
+    this.db = await this.sqlite.createConnection(
+      'cantiza',
+      false,
+      'no-encryption',
+      1,
+      false
+    );
+    await this.db.open();
+  }
 }
