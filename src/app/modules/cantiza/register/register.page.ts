@@ -82,7 +82,7 @@ export class RegisterPage implements OnInit {
 
   getUsers() {
     if (this.isOnline) {
-      this.cantizaService.getUsuarios(this.userId).subscribe({
+      this.cantizaService.getUsuarios(4).subscribe({
         next: (res) => {
           this.users = res;
         },
@@ -91,7 +91,7 @@ export class RegisterPage implements OnInit {
         }
       });
     }else{
-      this.dbService.getUsuarios(this.userId).then((res) => {
+      this.dbService.getUsuarios(4).then((res) => {
         this.users = res;
       });
     }

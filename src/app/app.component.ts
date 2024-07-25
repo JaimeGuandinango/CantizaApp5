@@ -49,7 +49,7 @@ export class AppComponent {
       await this.dbService.saveInformation();
     } else {
       console.log('Fetching items from the local SQLite database');
-      this.presentToast('bottom', 'Offline: Fetching items from the local SQLite database');
+      this.presentToast('bottom', 'Modo fuera de linea');
       this.dbService.openDB();
       localStorage.setItem('isOnline', 'OFF');
     }

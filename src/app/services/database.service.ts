@@ -18,15 +18,7 @@ export class DatabaseService {
   async createDatabase() {
     try {
       console.log("Creating database");
-      
-      // this.db = await this.sqlite.createConnection(
-      //   'cantiza',
-      //   false,
-      //   'no-encryption',
-      //   1,
-      //   false
-      // );
-      // await this.db.open();
+      await this.deleteAllTables();
       await this.createTables();
       await this.populateTables();
     } catch (error) {
@@ -297,7 +289,9 @@ CREATE TABLE can_usuario (
     const date = this.getFormattedDate();
       
       // Query for can_ingresos
-      const ingresosQuery = `SELECT * FROM can_ingresos WHERE can_ing_cochero = ${user} AND can_ing_create = ${date}`;
+      const ingresosQuery = `SELECT * FROM can_ingresos WHERE can_ing_cochero = ${user} AND can_ing_create >= ${date}`;
+      console.log("ingresosQuery",ingresosQuery);
+      
       const ingresosResult:any = await this.db.query(ingresosQuery);
       console.log("ingresosResult",ingresosResult.values);
       
@@ -396,4 +390,25 @@ CREATE TABLE can_usuario (
     return `${parts[2]}-${parts[1]}-${parts[0]}`;
   }
 
+  async deleteAllTables() {
+    try {
+      const dropTableQuery = `
+      DROP TABLE IF EXISTS can_area;
+      DROP TABLE IF EXISTS can_base;
+      DROP TABLE IF EXISTS can_bloque;
+      DROP TABLE IF EXISTS can_estimado;
+      DROP TABLE IF EXISTS can_finca;
+      DROP TABLE IF EXISTS can_informacion;
+      DROP TABLE IF EXISTS can_ingresos;
+      DROP TABLE IF EXISTS can_registro;
+      DROP TABLE IF EXISTS can_rosas;
+      DROP TABLE IF EXISTS can_tallos_malla;
+      DROP TABLE IF EXISTS can_tipo;
+      DROP TABLE IF EXISTS can_usuario;
+      `;
+      await this.executeSQL(dropTableQuery);
+    } catch (error) {
+      console.error('Unable to delete tables', error);
+    }
+  }
 }
